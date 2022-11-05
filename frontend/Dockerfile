@@ -1,31 +1,17 @@
-# FROM node:14.17.3
-
-# WORKDIR /frontend
-
-# COPY . .
-
-# RUN npm install
-
-# RUN npm run build
-
-
-# FROM nginx:1.21.0-alpine as production
-# ENV NODE_ENV production
-# COPY --from=builder /frontend/build /usr/share/nginx/html
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-# EXPOSE 80
-# CMD ["nginx", "-g", "daemon off;"]
-
-FROM node:14.17.6-alpine as build
-WORKDIR /frontend
-COPY package.json ./
-COPY ./ ./
-RUN npm i
+FROM node:16-alpine 
+# Set the working directory to /app inside the container
+WORKDIR /app
+# Copy app files
+COPY . .
+# ==== BUILD =====
+# Install dependencies (npm ci makes sure the exact versions in the lockfile gets installed)
+RUN npm ci 
+# Build the app
 RUN npm run build
-
-# production environment
-FROM nginx:stable-alpine
-COPY --from=build /frontend/build /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# ==== RUN =======
+# Set the env to "production"
+ENV NODE_ENV production
+# Expose the port on which the app will be running (3000 is the default that `serve` uses)
+EXPOSE 3000
+# Start the app
+CMD [ "npx", "serve", "build" ]
