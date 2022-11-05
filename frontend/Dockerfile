@@ -1,23 +1,31 @@
-FROM node:14.17.3
+# FROM node:14.17.3
 
-WORKDIR /frontend
+# WORKDIR /frontend
 
-COPY . .
+# COPY . .
 
-RUN npm install
+# RUN npm install
 
-EXPOSE 3000
+# RUN npm run build
 
-CMD ["npm", "start"]
 
-# Bundle static assets with nginx
 # FROM nginx:1.21.0-alpine as production
 # ENV NODE_ENV production
-# Copy built assets from `builder` image
-# COPY --from=builder /app/build /usr/share/nginx/html
-# Add your nginx.conf
+# COPY --from=builder /frontend/build /usr/share/nginx/html
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
-# Expose port
 # EXPOSE 80
-# Start nginx
 # CMD ["nginx", "-g", "daemon off;"]
+
+FROM node:14.17.6-alpine as build
+WORKDIR /frontend
+COPY package.json ./
+COPY ./ ./
+RUN npm i
+RUN npm run build
+
+# production environment
+FROM nginx:stable-alpine
+COPY --from=build /frontend/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
