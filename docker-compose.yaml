@@ -1,14 +1,14 @@
 services:
   web:
     image:
-      jaguar48/myfrontend:latest
+      jaguar48/appfrontend:latest
     ports:
       - "3000:3000"
     restart: always
    
    api:
       image:
-        jaguar48/hngapi:latest
+        jaguar48/hngapis:latest
       ports:
         - "8000:8000"
       restart: always
