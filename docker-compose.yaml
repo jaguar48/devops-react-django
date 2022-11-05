@@ -8,7 +8,7 @@ services:
    
    api:
       image:
-        jjaguar48/hngapi:latest
+        jaguar48/hngapi:latest
       ports:
         - "8000:8000"
       restart: always
